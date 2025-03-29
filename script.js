@@ -198,6 +198,34 @@ function startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) {
         }
     }, 1000);
 }
+// Functie om de e-mail te versturen
+function sendEmail() {
+  fetch('/api/sendEmail', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      subject: 'Studieplanner Herinnering',
+      text: 'Je tijd is om!',
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error('Fout bij het verzenden van e-mail:', error));
+}
+
+// Timer functie
+let timer = 10; // Stel hier je timer in (bijvoorbeeld 10 seconden)
+const timerInterval = setInterval(() => {
+  if (timer <= 0) {
+    clearInterval(timerInterval); // Stop de timer
+    sendEmail(); // Verstuur de e-mail wanneer de timer op nul staat
+  } else {
+    console.log(`Tijd over: ${timer}`);
+    timer--;
+  }
+}, 1000);
 
 // ✅ Taak opslaan in LocalStorage
 function updateLocalStorage(task) {
