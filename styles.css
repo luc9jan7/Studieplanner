@@ -1,0 +1,242 @@
+/* Algemene stijlen */
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #4CAF50, #1e1e2e);
+  color: #fff;
+  margin: 0;
+  padding: 20px; /* Voeg wat ruimte toe zodat scrollen natuurlijker aanvoelt */
+  min-height: 100vh; /* In plaats van height: 100vh, zodat de inhoud kan groeien */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Zorgt ervoor dat de inhoud van boven begint */
+  overflow-y: auto; /* Voorkomt dat scrollen wordt geblokkeerd */
+}
+
+
+/* Hoofdcontainer stijlen */
+.container {
+  width: 95%;
+  max-width: 700px;
+  background-color: #2b2d42;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.1); /* Verlichte schaduw voor modern effect */
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.container:hover {
+  box-shadow: 0px 16px 30px rgba(0, 0, 0, 0.15); /* Versterkte schaduw bij hover */
+}
+
+/* Titels */
+h1, h2 {
+  text-align: center;
+  font-weight: 600;
+  color: #fafafa;
+  margin-bottom: 20px;
+}
+
+/* Formulier stijlen */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+/* Invoervelden */
+input[type="text"], input[type="number"] {
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  background-color: #3e4e61;
+  color: #fff;
+  font-size: 18px;
+  box-sizing: border-box;
+  transition: background 0.3s ease;
+}
+
+input[type="text"]:focus, input[type="number"]:focus {
+  background-color: #4a5a6d; /* Verandert de achtergrondkleur bij focus */
+  outline: none;
+}
+
+/* Knoppen */
+button {
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 18px;
+  letter-spacing: 1px;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2); /* Subtiele schaduw bij hover */
+}
+
+button:active {
+  transform: scale(0.98); /* Schaal de knop een beetje in bij klikken */
+}
+
+/* Lijst van taken */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  background-color: #3e4e61;
+  padding: 16px;
+  border-radius: 10px;
+  margin: 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+}
+
+li:hover {
+  background-color: #4a5a6d;
+  transform: translateX(5px); /* Subtiele beweging bij hover */
+}
+
+li .completed {
+  text-decoration: line-through;
+  color: #b5b5b5;
+}
+
+/* Vooruitgang balk */
+#progress-container {
+  width: 100%;
+  height: 16px;
+  background: #3e4e61;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #4CAF50;
+  border-radius: 8px;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Popup stijl */
+.popup {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #2f533a;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.popup.show {
+  display: block;
+  transform: translate(-50%, -45%);
+}
+
+.popup button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.popup button:hover {
+  background: #0056b3;
+  transform: scale(1.05); /* Subtiele vergroting bij hover */
+}
+
+/* Folder sectie */
+.folder-section {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #2b2d42;
+}
+
+.folder-section summary {
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 5px;
+  list-style: none;
+  transition: background 0.3s ease-in-out;
+}
+
+.folder-section summary:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Taaklijst in folders */
+.task-list {
+  padding-left: 20px;
+}
+.folder-progress {
+    margin-top: 10px;
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+}
+
+.folder-progress-bar {
+    height: 100%;
+    background-color: #4caf50;
+    width: 0%;
+}
+
+.folder-progress-text {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 12px;
+}
+.folder-progress-text {
+    font-size: 12px;
+    color: #555;
+    margin-left: 5px;
+}
+.progress-wrapper {
+    margin-top: 10px;
+    width: 100%;
+    height: 20px;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4caf50;
+    border-radius: 10px;
+}
+
+.progress-text {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+}
