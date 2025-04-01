@@ -184,7 +184,7 @@ function startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) {
 
             // 🔊 Geluid afspelen (audio afspelen)
             if (!notificationSound) {
-                notificationSound = new Audio('audio/melding.mp3'); // Als het geluid nog niet is geladen, laad het dan
+                notificationSound = new Audio('melding.mp3'); // Als het geluid nog niet is geladen, laad het dan
             }
             notificationSound.play();
 
