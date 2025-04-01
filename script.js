@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', loadTasksFromLocalStorage);
 document.addEventListener('DOMContentLoaded', loadFoldersFromLocalStorage);
 
+
 let totalTasks = 0;
 let completedTasks = 0;
 let activeTimers = {}; 
@@ -109,6 +110,8 @@ document.getElementById('task-form').addEventListener('submit', function(e) {
         folder: taskFolder 
     };
 
+    
+
     let storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
     storedTasks.push(newTask);
     localStorage.setItem('tasks', JSON.stringify(storedTasks));
@@ -153,15 +156,52 @@ function addEventListeners(listItem, task, folder) {
         updateLocalStorage(task);
         updateFolderProgress(folder, [task]); // Update de voortgang van de map
         loadTasksFromLocalStorage();
+
+        let userPoints = localStorage.getItem("points") || 0;  // Haal punten op of zet op 0
+let badges = JSON.parse(localStorage.getItem("badges")) || [];
+
+// Wanneer een taak wordt voltooid (checkbox verandert)
+checkbox.addEventListener('change', () => {
+    task.completed = checkbox.checked;
+    updateLocalStorage(task);
+    updateFolderProgress(folder, [task]); // Update de voortgang van de map
+    loadTasksFromLocalStorage();
+
+    // Als de taak is voltooid, voeg dan punten toe
+    if (task.completed) {
+        const taskPoints = task.time / 60;  // Bijvoorbeeld: 1 minuut = 1 punt
+        userPoints += taskPoints;
+        localStorage.setItem("points", userPoints);  // Sla de punten op in localStorage
+
+        // Controleer of er een nieuwe badge is vrijgespeeld
+        checkBadges(userPoints);
+    }
+});
+
+// Functie om badges te controleren
+function checkBadges(points) {
+    if (points >= 50 && !badges.includes("Beginner Badge")) {
+        badges.push("Beginner Badge");
+        alert("Gefeliciteerd! Je hebt de Beginner Badge verdiend!");
+    }
+    if (points >= 100 && !badges.includes("Pro Badge")) {
+        badges.push("Pro Badge");
+        alert("Gefeliciteerd! Je hebt de Pro Badge verdiend!");
+    }
+
+    localStorage.setItem("badges", JSON.stringify(badges));  // Sla de badges op in localStorage
+}
+
     });
 }
 
 
-// ✅ Timer starten
+let notificationSound = null;  // Dit maakt de audio globaal beschikbaar
+
+
 function startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) {
     if (activeTimers[task.name]) return;
 
-    // Zorg ervoor dat we geen timer starten voor een taak die al voltooid is
     if (task.completed) {
         console.log(`Taak ${task.name} is al voltooid, geen timer gestart.`);
         return;
@@ -180,24 +220,87 @@ function startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) {
             stopBtn.disabled = true;
             task.completed = true;
 
-            console.log(`Taak voltooid: ${task.name}, Email verzonden: ${task.emailSent}`); // Log om te controleren
-
-            // Controleer of de e-mail al is verzonden, indien niet, verstuur de e-mail
-            if (!task.emailSent) {
-                sendEmailNotification(task); // Functie om e-mail te versturen
-                task.emailSent = true; // Zet de vlag dat de e-mail is verzonden
-                console.log(`E-mail verstuurd voor taak: ${task.name}`); // Log dat de e-mail is verzonden
-                updateLocalStorage(task); // Update de taak in localStorage
+            // 🔊 Geluid afspelen (audio afspelen)
+            if (!notificationSound) {
+                notificationSound = new Audio(''); // Als het geluid nog niet is geladen, laad het dan
             }
+            notificationSound.play();
 
-            updateFolderProgress(task.folder, [task]); // Update de voortgang van de map
+            // ✅ Pop-up melding
+            showPopup(`⏰Honeeeeyyy je tijd zit er op voor je "${task.name}" taak!⏰`);
+
+            updateFolderProgress(task.folder, [task]);
         } else {
             task.remaining--;
             timerDisplay.textContent = formatTime(task.remaining);
-            updateLocalStorage(task); // Update de resterende tijd in localStorage
+            updateLocalStorage(task);
         }
     }, 1000);
 }
+
+
+// Functie om de pop-up te sluiten
+function closePopup() {
+    // Stop de audio als die speelt
+    if (notificationSound) {
+        notificationSound.pause();  // Stop de audio
+        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
+    }
+
+    document.getElementById('popup').style.display = 'none';
+}
+
+
+function closePopup() {
+    // Stop de audio als die speelt
+    if (notificationSound) {
+        notificationSound.pause();  // Stop de audio
+        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
+    }
+
+    // Verberg de pop-up
+    document.getElementById('popup').style.display = 'none';
+}
+
+
+
+
+// Functie om de pop-up te tonen
+function showPopup(message) {
+    document.getElementById('popup-message').textContent = message;
+    document.getElementById('popup').style.display = 'block';
+}
+
+// Functie om de pop-up te sluiten
+function closePopup() {
+    // Stop de audio als die speelt
+    if (notificationSound) {
+        notificationSound.pause();  // Stop de audio
+        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
+    }
+
+    // Verberg de pop-up
+    document.getElementById('popup').style.display = 'none';
+}
+
+
+
+
+
+
+// Functie om de pop-up te tonen
+function showPopup(message) {
+    document.getElementById('popup-message').textContent = message;
+    document.getElementById('popup').style.display = 'block';
+}
+
+// Functie om de pop-up te sluiten
+function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+}
+
+
+
 // Functie om de e-mail te versturen
 function sendEmail() {
   fetch('/api/sendEmail', {
