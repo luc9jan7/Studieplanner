@@ -110,8 +110,6 @@ document.getElementById('task-form').addEventListener('submit', function(e) {
         folder: taskFolder 
     };
 
-    
-
     let storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
     storedTasks.push(newTask);
     localStorage.setItem('tasks', JSON.stringify(storedTasks));
@@ -156,42 +154,6 @@ function addEventListeners(listItem, task, folder) {
         updateLocalStorage(task);
         updateFolderProgress(folder, [task]); // Update de voortgang van de map
         loadTasksFromLocalStorage();
-
-        let userPoints = localStorage.getItem("points") || 0;  // Haal punten op of zet op 0
-let badges = JSON.parse(localStorage.getItem("badges")) || [];
-
-// Wanneer een taak wordt voltooid (checkbox verandert)
-checkbox.addEventListener('change', () => {
-    task.completed = checkbox.checked;
-    updateLocalStorage(task);
-    updateFolderProgress(folder, [task]); // Update de voortgang van de map
-    loadTasksFromLocalStorage();
-
-    // Als de taak is voltooid, voeg dan punten toe
-    if (task.completed) {
-        const taskPoints = task.time / 60;  // Bijvoorbeeld: 1 minuut = 1 punt
-        userPoints += taskPoints;
-        localStorage.setItem("points", userPoints);  // Sla de punten op in localStorage
-
-        // Controleer of er een nieuwe badge is vrijgespeeld
-        checkBadges(userPoints);
-    }
-});
-
-// Functie om badges te controleren
-function checkBadges(points) {
-    if (points >= 50 && !badges.includes("Beginner Badge")) {
-        badges.push("Beginner Badge");
-        alert("Gefeliciteerd! Je hebt de Beginner Badge verdiend!");
-    }
-    if (points >= 100 && !badges.includes("Pro Badge")) {
-        badges.push("Pro Badge");
-        alert("Gefeliciteerd! Je hebt de Pro Badge verdiend!");
-    }
-
-    localStorage.setItem("badges", JSON.stringify(badges));  // Sla de badges op in localStorage
-}
-
     });
 }
 
@@ -222,7 +184,7 @@ function startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) {
 
             // 🔊 Geluid afspelen (audio afspelen)
             if (!notificationSound) {
-                notificationSound = new Audio(''); // Als het geluid nog niet is geladen, laad het dan
+                notificationSound = new Audio('audio/melding.mp3'); // Als het geluid nog niet is geladen, laad het dan
             }
             notificationSound.play();
 
@@ -525,5 +487,26 @@ function updateLocalStorage(task) {
 
     localStorage.setItem('tasks', JSON.stringify(tasks)); // Sla de bijgewerkte taken op
     console.log("Taken opgeslagen in localStorage:", tasks); // Log de opgeslagen taken
+}
+
+// Voeg de event listener toe aan de sluitknop van de pop-up
+document.getElementById('popup-close-btn').addEventListener('click', closePopup);
+
+// Functie om de pop-up te sluiten en audio te stoppen
+function closePopup() {
+    // Zoek het audio-element
+    const notificationSound = document.getElementById('alarm-sound');
+
+    // Controleer of de audio bestaat en speelt
+    if (notificationSound && !notificationSound.paused) {
+        notificationSound.pause();  // Stop de audio
+        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
+    }
+
+    // Verberg de pop-up
+    const popup = document.getElementById('popup');
+    if (popup) {
+        popup.style.display = 'none';  // Verberg de pop-up
+    }
 }
 
