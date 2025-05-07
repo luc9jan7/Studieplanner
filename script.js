@@ -1,512 +1,713 @@
-document.addEventListener('DOMContentLoaded', loadTasksFromLocalStorage);
-document.addEventListener('DOMContentLoaded', loadFoldersFromLocalStorage);
+document.addEventListener('DOMContentLoaded', loadTasksFromLocalStorage); 
 
+document.addEventListener('DOMContentLoaded', loadFoldersFromLocalStorage); 
 
-let totalTasks = 0;
-let completedTasks = 0;
-let activeTimers = {}; 
+document.addEventListener('DOMContentLoaded', function () { 
 
-// ✅ Mappen laden vanuit localStorage
-function loadFoldersFromLocalStorage() {
-    const storedFolders = JSON.parse(localStorage.getItem('folders')) || [];
-    const folderList = document.getElementById('folder-list');
-    const taskFolderSelect = document.getElementById('task-folder');
+    document.querySelectorAll('.folder-section summary').forEach(summary => { 
 
-    // Leeg de lijst van mappen
-    folderList.innerHTML = '';
-    taskFolderSelect.innerHTML = '<option value="">Selecteer een map</option>';  // Reset de mapkeuze in takenformulier
+        summary.addEventListener('click', function () { 
 
-    // Voeg mappen toe aan de lijst
-    storedFolders.forEach(folder => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `
-            ${folder} 
-            <button class="delete-folder-btn" data-folder="${folder}">Verwijder</button>
-        `;
-        folderList.appendChild(listItem);
+            const details = this.parentNode; 
 
-        // Voeg de map toe aan de selectielijst voor taken
-        const option = document.createElement('option');
-        option.value = folder;
-        option.textContent = folder;
-        taskFolderSelect.appendChild(option);
-    });
+  
 
-    // Voeg event listeners toe aan de verwijderknoppen
-    document.querySelectorAll('.delete-folder-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const folderToDelete = e.target.getAttribute('data-folder');
-            deleteFolder(folderToDelete);
-        });
-    });
-}
+            // Sluit andere geopende details 
 
-function deleteFolder(folderName) {
-    let storedFolders = JSON.parse(localStorage.getItem('folders')) || [];
+            document.querySelectorAll('.folder-section[open]').forEach(openDetails => { 
+
+                if (openDetails !== details) { 
+
+                    openDetails.removeAttribute('open'); 
+
+                } 
+
+            }); 
+
+  
+
+            // Voorkom dat details direct sluit bij klikken 
+
+            setTimeout(() => { 
+
+                details.toggleAttribute('open'); 
+
+            }, 50); 
+
+        }); 
+
+    }); 
+
+}); 
+
+  
+
+// ✅ Popup tonen 
+
+function showPopup(message) { 
+
+    document.getElementById('popup-message').textContent = message; 
+
+    document.getElementById('popup').style.display = 'block'; 
+
+  
+
+    // Speel alarmgeluid af 
+
+    const alarmSound = document.getElementById('alarm-sound'); 
+
+    alarmSound.play(); 
+
+} 
+
+  
+
+// ✅ Popup sluiten 
+
+function closePopup() { 
+
+    document.getElementById('popup').style.display = 'none'; 
+
+  
+
+    // Stop geluid 
+
+    const alarmSound = document.getElementById('alarm-sound'); 
+
+    alarmSound.pause(); 
+
+    alarmSound.currentTime = 0; 
+
+} 
+
+  
+
+let totalTasks = 0; 
+
+let completedTasks = 0; 
+
+let activeTimers = {};  
+
+  
+
+// ✅ Mappen laden vanuit localStorage 
+
+function loadFoldersFromLocalStorage() { 
+
+    const storedFolders = JSON.parse(localStorage.getItem('folders')) || []; 
+
+    const folderList = document.getElementById('folder-list'); 
+
+    const taskFolderSelect = document.getElementById('task-folder'); 
+
+  
+
+    folderList.innerHTML = ''; 
+
+    taskFolderSelect.innerHTML = '<option value="">Selecteer een map</option>'; 
+
+  
+
+    storedFolders.forEach(folder => { 
+
+        const listItem = document.createElement('li'); 
+
+        listItem.textContent = folder; 
+
+  
+
+        const deleteBtn = document.createElement('button'); 
+
+        deleteBtn.textContent = 'Verwijder'; 
+
+        deleteBtn.classList.add('delete-folder-btn'); 
+
+        deleteBtn.addEventListener('click', () => deleteFolder(folder)); 
+
+  
+
+        listItem.appendChild(deleteBtn); 
+
+        folderList.appendChild(listItem); 
+
+  
+
+        const option = document.createElement('option'); 
+
+        option.value = folder; 
+
+        option.textContent = folder; 
+
+        taskFolderSelect.appendChild(option); 
+
+    }); 
+
+} 
+
+  
+
+// ✅ Map verwijderen 
+
+function deleteFolder(folderName) { 
+
+    let storedFolders = JSON.parse(localStorage.getItem('folders')) || []; 
+
+    let storedTasks = JSON.parse(localStorage.getItem('tasks')) || []; 
+
+     
+
+    // Controleer of er taken in de map zitten 
+
+    let tasksInFolder = storedTasks.filter(task => task.folder === folderName); 
+
+     
+
+    let confirmMessage = tasksInFolder.length > 0  
+
+        ? `De map "${folderName}" bevat nog ${tasksInFolder.length} taken. Weet je zeker dat je deze map en de taken wilt verwijderen?` 
+
+        : `Weet je zeker dat je de map "${folderName}" wilt verwijderen?`; 
+
+  
+
+    if (!confirm(confirmMessage)) return; 
+
+  
+
+    // Verwijder de map 
+
+    storedFolders = storedFolders.filter(folder => folder !== folderName); 
+
+    localStorage.setItem('folders', JSON.stringify(storedFolders)); 
+
+  
+
+    // Verwijder taken die in deze map zaten 
+
+    storedTasks = storedTasks.filter(task => task.folder !== folderName); 
+
+    localStorage.setItem('tasks', JSON.stringify(storedTasks)); 
+
+  
+
+    loadFoldersFromLocalStorage(); 
+
+    loadTasksFromLocalStorage(); 
+
+} 
+
+  
+
+  
+
+// ✅ Nieuwe map toevoegen 
+
+document.getElementById('folder-form').addEventListener('submit', function(e) { 
+
+    e.preventDefault(); 
+
+    const folderName = document.getElementById('folder-name').value.trim(); 
+
+    if (!folderName) return; 
+
+  
+
+    let storedFolders = JSON.parse(localStorage.getItem('folders')) || []; 
+
+     
+
+    if (!storedFolders.includes(folderName)) { 
+
+        storedFolders.push(folderName); 
+
+        localStorage.setItem('folders', JSON.stringify(storedFolders)); 
+
+    } 
+
+  
+
+    loadFoldersFromLocalStorage(); 
+
+    loadTasksFromLocalStorage(); 
+
+    e.target.reset(); 
+
+}); 
+
+  
+
+// ✅ Taken laden bij pagina-refresh 
+
+  
+
+function loadTasksFromLocalStorage() { 
+
+    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || []; 
+
+    const groupedTasks = groupTasksByFolder(storedTasks); 
+
+    const taskListContainer = document.getElementById('task-list'); 
+
+    taskListContainer.innerHTML = ''; // Leegmaken voor herladen 
+
+  
+
+    for (const folder in groupedTasks) { 
+
+        const folderSection = document.createElement('details'); 
+
+        folderSection.classList.add('folder-section'); 
+
+  
+
+        const summary = document.createElement('summary'); 
+
+        summary.textContent = folder; 
+
+  
+
+        const taskContainer = document.createElement('ul'); 
+
+        taskContainer.classList.add('task-list'); 
+
+  
+
+        groupedTasks[folder].forEach(task => addTaskToDOM(task, taskContainer, folder)); 
+
+  
+
+        folderSection.appendChild(summary); 
+
+        folderSection.appendChild(taskContainer); 
+
+        taskListContainer.appendChild(folderSection); 
+
+    } 
+
+} 
+
+  
+
+  
+
+    updateProgress(); 
+
+  
+
+// ✅ Groeperen van taken per map 
+
+function groupTasksByFolder(tasks) { 
+
+    return tasks.reduce((groups, task) => { 
+
+        if (!groups[task.folder]) { 
+
+            groups[task.folder] = []; 
+
+        } 
+
+        groups[task.folder].push(task); 
+
+        return groups; 
+
+    }, {}); 
+
+} 
+
+  
+
+// ✅ Nieuwe taak toevoegen 
+
+document.getElementById('task-form').addEventListener('submit', function(e) { 
     
-    // Filter de map eruit
-    storedFolders = storedFolders.filter(folder => folder !== folderName);
-    localStorage.setItem('folders', JSON.stringify(storedFolders));
-
-    // Ook alle taken in deze map verwijderen
-    let storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    storedTasks = storedTasks.filter(task => task.folder !== folderName);
-    localStorage.setItem('tasks', JSON.stringify(storedTasks));
-
-    // UI updaten
-    loadFoldersFromLocalStorage();
-    loadTasksFromLocalStorage();
-}
-
-
-// ✅ Nieuwe map toevoegen
-document.getElementById('folder-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const folderName = document.getElementById('folder-name').value.trim();
-    if (!folderName) return;
-
-    // Haal bestaande mappen op uit localStorage
-    let storedFolders = JSON.parse(localStorage.getItem('folders')) || [];
-    
-    // Voeg de nieuwe map toe aan de lijst van mappen
-    if (!storedFolders.includes(folderName)) {
-        storedFolders.push(folderName);
-        localStorage.setItem('folders', JSON.stringify(storedFolders));
-    }
-
-    // Herlaad de mappenlijst en de selectielijst voor taken
-    loadFoldersFromLocalStorage();
-    loadTasksFromLocalStorage();  // Herlaad de takenlijst om de nieuwe map zichtbaar te maken
-    e.target.reset();
-});
-
-
-
-// ✅ Groeperen van taken per map
-function groupTasksByFolder(tasks) {
-    return tasks.reduce((groups, task) => {
-        if (!groups[task.folder]) {
-            groups[task.folder] = [];
-        }
-        groups[task.folder].push(task);
-        return groups;
-    }, {});
-}
-
-// ✅ Nieuwe taak toevoegen
-document.getElementById('task-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const taskName = document.getElementById('task-name').value;
-    const taskTime = parseInt(document.getElementById('task-time').value, 10);
-    const taskFolder = document.getElementById('task-folder').value;
-
-    if (!taskName || isNaN(taskTime) || !taskFolder) return;
-
-    const newTask = { 
-        name: taskName, 
-        time: taskTime * 60, 
-        remaining: taskTime * 60, 
-        completed: false,
-        folder: taskFolder 
-    };
-
-    let storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    storedTasks.push(newTask);
-    localStorage.setItem('tasks', JSON.stringify(storedTasks));
-
-    loadTasksFromLocalStorage();  // Herlaad de takenlijst om de nieuwe taak weer te geven
-    updateProgress();
-    e.target.reset();
-});
-
-// ✅ Taak weergeven in de lijst
-function addTaskToDOM(task, taskList, folder) {
-    const listItem = document.createElement('li');
-    listItem.innerHTML = `
-        <span>${task.name} - <span class="timer">${formatTime(task.remaining)}</span></span>
-        <button class="start-btn">Start</button>
-        <button class="pause-btn" disabled>Pauze</button>
-        <button class="stop-btn" disabled>Stop</button>
-        <button class="delete-btn">Verwijder</button>
-        <input type="checkbox" class="task-complete" ${task.completed ? 'checked' : ''}>
-    `;
-    
-    taskList.appendChild(listItem);
-    addEventListeners(listItem, task, folder);
-}
-
-// ✅ Event listeners voor knoppen
-function addEventListeners(listItem, task, folder) {
-    const timerDisplay = listItem.querySelector('.timer');
-    const startBtn = listItem.querySelector('.start-btn');
-    const pauseBtn = listItem.querySelector('.pause-btn');
-    const stopBtn = listItem.querySelector('.stop-btn');
-    const deleteBtn = listItem.querySelector('.delete-btn');
-    const checkbox = listItem.querySelector('.task-complete');
-
-    startBtn.addEventListener('click', () => startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn));
-    pauseBtn.addEventListener('click', () => pauseTimer(task, startBtn, pauseBtn));
-    stopBtn.addEventListener('click', () => stopTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn));
-    deleteBtn.addEventListener('click', () => deleteTask(task, listItem));
 
-    checkbox.addEventListener('change', () => {
-        task.completed = checkbox.checked;
-        updateLocalStorage(task);
-        updateFolderProgress(folder, [task]); // Update de voortgang van de map
-        loadTasksFromLocalStorage();
-    });
-}
+    e.preventDefault(); 
 
+    const taskName = document.getElementById('task-name').value; 
 
-let notificationSound = null;  // Dit maakt de audio globaal beschikbaar
+    const hours = parseInt(document.getElementById('task-hours').value, 10) || 0;
+const minutes = parseInt(document.getElementById('task-minutes').value, 10) || 0;
+const taskTime = (hours * 60) + minutes;
+ 
 
+    const taskFolder = document.getElementById('task-folder').value; 
 
-function startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) {
-    if (activeTimers[task.name]) return;
+  
 
-    if (task.completed) {
-        console.log(`Taak ${task.name} is al voltooid, geen timer gestart.`);
-        return;
-    }
+    if (!taskName || isNaN(taskTime) || !taskFolder) return; 
 
-    startBtn.disabled = true;
-    pauseBtn.disabled = false;
-    stopBtn.disabled = false;
+  
 
-    activeTimers[task.name] = setInterval(() => {
-        if (task.remaining <= 0) {
-            clearInterval(activeTimers[task.name]);
-            delete activeTimers[task.name];
-            startBtn.disabled = false;
-            pauseBtn.disabled = true;
-            stopBtn.disabled = true;
-            task.completed = true;
-
-            // 🔊 Geluid afspelen (audio afspelen)
-            if (!notificationSound) {
-                notificationSound = new Audio('melding.mp3'); // Als het geluid nog niet is geladen, laad het dan
-            }
-            notificationSound.play();
-
-            // ✅ Pop-up melding
-            showPopup(`⏰Honeeeeyyy je tijd zit er op voor je "${task.name}" taak!⏰`);
-
-            updateFolderProgress(task.folder, [task]);
-        } else {
-            task.remaining--;
-            timerDisplay.textContent = formatTime(task.remaining);
-            updateLocalStorage(task);
-        }
-    }, 1000);
-}
-
-
-// Functie om de pop-up te sluiten
-function closePopup() {
-    // Stop de audio als die speelt
-    if (notificationSound) {
-        notificationSound.pause();  // Stop de audio
-        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
-    }
-
-    document.getElementById('popup').style.display = 'none';
-}
-
-
-function closePopup() {
-    // Stop de audio als die speelt
-    if (notificationSound) {
-        notificationSound.pause();  // Stop de audio
-        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
-    }
-
-    // Verberg de pop-up
-    document.getElementById('popup').style.display = 'none';
-}
-
-
-
-
-// Functie om de pop-up te tonen
-function showPopup(message) {
-    document.getElementById('popup-message').textContent = message;
-    document.getElementById('popup').style.display = 'block';
-}
-
-// Functie om de pop-up te sluiten
-function closePopup() {
-    // Stop de audio als die speelt
-    if (notificationSound) {
-        notificationSound.pause();  // Stop de audio
-        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
-    }
-
-    // Verberg de pop-up
-    document.getElementById('popup').style.display = 'none';
-}
-
-
-
-
-
-
-// Functie om de pop-up te tonen
-function showPopup(message) {
-    document.getElementById('popup-message').textContent = message;
-    document.getElementById('popup').style.display = 'block';
-}
+    const newTask = {  
 
-// Functie om de pop-up te sluiten
-function closePopup() {
-    document.getElementById('popup').style.display = 'none';
-}
-
-
-
-// Functie om de e-mail te versturen
-function sendEmail() {
-  fetch('/api/sendEmail', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      subject: 'Studieplanner Herinnering',
-      text: 'Je tijd is om!',
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((error) => console.error('Fout bij het verzenden van e-mail:', error));
-}
-
-// Timer functie
-let timer = 10; // Stel hier je timer in (bijvoorbeeld 10 seconden)
-const timerInterval = setInterval(() => {
-  if (timer <= 0) {
-    clearInterval(timerInterval); // Stop de timer
-    sendEmail(); // Verstuur de e-mail wanneer de timer op nul staat
-  } else {
-    console.log(`Tijd over: ${timer}`);
-    timer--;
-  }
-}, 1000);
-
-// ✅ Taak opslaan in LocalStorage
-function updateLocalStorage(task) {
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const taskIndex = tasks.findIndex(t => t.name === task.name);
-    if (taskIndex > -1) {
-        tasks[taskIndex] = task;  // Werk de taak bij, inclusief de 'emailSent' vlag
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-}
-
-// ✅ Taken laden bij pagina-refresh
-function loadTasksFromLocalStorage() {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    totalTasks = storedTasks.length;
-    completedTasks = storedTasks.filter(task => task.completed).length;
-
-    const groupedTasks = groupTasksByFolder(storedTasks);
-
-    // Log om te zien welke taken we laden
-    console.log("Gelezen taken uit localStorage:", storedTasks); 
-
-    // Leeg de huidige weergave
-    document.getElementById('task-list').innerHTML = '';
-
-    // Weergeven per map
-    for (const folder in groupedTasks) {
-        const folderSection = document.createElement('section');
-        folderSection.innerHTML = ` 
-            <h3>${folder}</h3>
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar-${folder}"></div>
-            </div>
-            <p id="progress-text-${folder}">0% voltooid</p>
-            <ul></ul>`;
-
-        const taskList = folderSection.querySelector('ul');
-        groupedTasks[folder].forEach(task => {
-            // Zorg ervoor dat de 'emailSent' vlag aanwezig is (indien niet, zet deze op false)
-            if (task.emailSent === undefined) {
-                task.emailSent = false;
-            }
-
-            console.log(`Taak geladen: ${task.name}, Email verzonden: ${task.emailSent}`);
-
-            addTaskToDOM(task, taskList, folder);
-        });
-
-        document.getElementById('task-list').appendChild(folderSection);
-        updateFolderProgress(folder, groupedTasks[folder]);
-    }
-
-    updateProgress();
-}
-
-console.log(`Gelezen taak: ${task.name}, Email verzonden: ${task.emailSent}`);
-
-
-
-
-
-
-
-// Functie voor het verzenden van e-mailmelding
-function sendEmailNotification(task) {
-    fetch('http://localhost:3000/send-email', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            subject: `Tiffany Studieplanner: ${task.name}`,
-            text: `De tijd voor mijn taak "${task.name}" afgelopen!`
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('E-mail verzonden:', data);
-    })
-    .catch(error => {
-        console.error('Fout bij het verzenden van de e-mail:', error);
-    });
-}
-
-// Voorbeeld van hoe je deze functie zou kunnen aanroepen
-sendEmailNotification('Test', 'Dit is een test');
-
-
-function pauseTimer(task, startBtn, pauseBtn) {
-    clearInterval(activeTimers[task.name]); // Stop de interval
-    delete activeTimers[task.name]; // Verwijder de actieve timer
-
-    startBtn.disabled = false; // Zet de startknop weer aan
-    pauseBtn.disabled = true; // Zet de pauzeknop uit
-}
-
-
-// ✅ Timer stoppen
-function stopTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) {
-    clearInterval(activeTimers[task.name]); // Stop de interval
-    delete activeTimers[task.name]; // Verwijder de actieve timer
-
-    task.remaining = task.time; // Reset de resterende tijd naar de oorspronkelijke tijd
-    timerDisplay.textContent = formatTime(task.remaining); // Werk de timerweergave bij
-
-    startBtn.disabled = false; // Zet de startknop weer aan
-    pauseBtn.disabled = true; // Zet de pauzeknop uit
-    stopBtn.disabled = true; // Zet de stopknop uit
-
-    updateLocalStorage(task); // Werk de taak bij in localStorage
-}
-
-
-// ✅ Taak verwijderen
-function deleteTask(task, listItem) {
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks = tasks.filter(t => t.name !== task.name);
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    listItem.remove();
-    totalTasks--;
-    updateProgress();
-}
-
-// ✅ Helpers
-function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
-function updateProgress() {
-    completedTasks = JSON.parse(localStorage.getItem('tasks')).filter(task => task.completed).length;
-    const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-    document.getElementById('progress-bar').style.width = `${progress}%`;
-    document.getElementById('progress-text').textContent = `${Math.round(progress)}% voltooid`;
-}
-
-function updateFolderProgress(folder, tasks) {
-    const completedInFolder = tasks.filter(task => task.completed).length;
-    const totalInFolder = tasks.length;
-    const progress = totalInFolder > 0 ? (completedInFolder / totalInFolder) * 100 : 0;
-
-    // Update de voortgangsbalk voor de map
-    document.getElementById(`progress-bar-${folder}`).style.width = `${progress}%`;
-    document.getElementById(`progress-text-${folder}`).textContent = `${Math.round(progress)}% voltooid`;
-}
-
-function updateLocalStorage(task) {
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const taskIndex = tasks.findIndex(t => t.name === task.name);
-    if (taskIndex > -1) {
-        tasks[taskIndex] = task;
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-}
-// ✅ Functie voor het verzenden van e-mailmelding
-function sendEmailNotification(task) {
-    // Zorg ervoor dat we de email alleen sturen als de taak op 0 is
-    console.log('Verzenden e-mail voor taak:', task.name);
-
-    fetch('http://localhost:3000/send-email', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            subject: `Tiffany Studieplanner: ${task.name}`,
-            text: `De tijd voor mijn taak "${task.name}" afgelopen!`
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('E-mail succesvol verzonden:', data);
-    })
-    .catch(error => {
-        console.error('Fout bij het verzenden van de e-mail:', error);
-    });
-}
-
-// ✅ Update de taak in localStorage
-function updateLocalStorage(task) {
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const taskIndex = tasks.findIndex(t => t.name === task.name);
-
-    console.log(`Taak updaten: ${task.name}, Email verzonden: ${task.emailSent}`); // Log de taak en de emailSent vlag
-
-    if (taskIndex > -1) {
-        // Vervang de oude taak door de nieuwe taak met de 'emailSent' vlag
-        tasks[taskIndex] = task;
-    } else {
-        // Voeg de taak toe als deze nog niet bestaat
-        tasks.push(task);
-    }
-
-    localStorage.setItem('tasks', JSON.stringify(tasks)); // Sla de bijgewerkte taken op
-    console.log("Taken opgeslagen in localStorage:", tasks); // Log de opgeslagen taken
-}
-
-// Voeg de event listener toe aan de sluitknop van de pop-up
-document.getElementById('popup-close-btn').addEventListener('click', closePopup);
-
-// Functie om de pop-up te sluiten en audio te stoppen
-function closePopup() {
-    // Zoek het audio-element
-    const notificationSound = document.getElementById('alarm-sound');
-
-    // Controleer of de audio bestaat en speelt
-    if (notificationSound && !notificationSound.paused) {
-        notificationSound.pause();  // Stop de audio
-        notificationSound.currentTime = 0;  // Zet de tijd terug naar het begin
-    }
-
-    // Verberg de pop-up
-    const popup = document.getElementById('popup');
-    if (popup) {
-        popup.style.display = 'none';  // Verberg de pop-up
-    }
-}
+        name: taskName,  
 
+        time: taskTime * 60,  
+
+        remaining: taskTime * 60,  
+
+        completed: false, 
+
+        folder: taskFolder  
+
+    }; 
+
+  
+
+    let storedTasks = JSON.parse(localStorage.getItem('tasks')) || []; 
+
+    storedTasks.push(newTask); 
+
+    localStorage.setItem('tasks', JSON.stringify(storedTasks)); 
+
+  
+
+    loadTasksFromLocalStorage(); 
+
+    updateProgress(); 
+
+    e.target.reset(); 
+
+}); 
+
+  
+
+// ✅ Taak weergeven in de lijst 
+
+function addTaskToDOM(task, taskList, folder) { 
+
+    const listItem = document.createElement('li'); 
+
+    listItem.innerHTML = `  
+
+        <span>${task.name} - <span class="timer">${formatTime(task.remaining)}</span></span> 
+
+        <button class="start-btn">Start</button> 
+
+        <button class="pause-btn" disabled>Pauze</button> 
+
+        <button class="stop-btn" disabled>Stop</button> 
+
+        <button class="delete-btn">Verwijder</button> 
+
+        <input type="checkbox" class="task-complete" ${task.completed ? 'checked' : ''}> 
+
+    `; 
+
+     
+
+    taskList.appendChild(listItem); 
+
+    addEventListeners(listItem, task, folder); 
+
+} 
+
+  
+
+// ✅ Event listeners voor knoppen 
+
+function addEventListeners(listItem, task, folder) { 
+
+    const timerDisplay = listItem.querySelector('.timer'); 
+
+    const startBtn = listItem.querySelector('.start-btn'); 
+
+    const pauseBtn = listItem.querySelector('.pause-btn'); 
+
+    const stopBtn = listItem.querySelector('.stop-btn'); 
+
+    const deleteBtn = listItem.querySelector('.delete-btn'); 
+
+    const checkbox = listItem.querySelector('.task-complete'); 
+
+  
+
+    startBtn.addEventListener('click', () => startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn)); 
+
+    pauseBtn.addEventListener('click', () => pauseTimer(task, startBtn, pauseBtn)); 
+
+    stopBtn.addEventListener('click', () => stopTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn)); 
+
+    deleteBtn.addEventListener('click', () => deleteTask(task, listItem)); 
+
+  
+
+    checkbox.addEventListener('change', () => { 
+
+        task.completed = checkbox.checked; 
+
+        updateLocalStorage(task); 
+
+        updateFolderProgress(folder, [task]); 
+
+        loadTasksFromLocalStorage(); 
+
+    }); 
+
+} 
+
+  
+
+/// ✅ Timer starten met popup en geluid wanneer tijd om is 
+
+function startTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) { 
+
+    if (!activeTimers[task.name]) { 
+
+        activeTimers[task.name] = setInterval(() => { 
+
+            if (task.remaining > 0) { 
+
+                task.remaining--; 
+
+                timerDisplay.textContent = formatTime(task.remaining); 
+
+                updateLocalStorage(task); 
+
+            } else { 
+
+                clearInterval(activeTimers[task.name]); 
+
+                activeTimers[task.name] = null; 
+
+                 
+
+                // 🚨 ALARM AFSPELEN 🚨 
+
+                document.getElementById('alarm-sound').play(); 
+
+                 
+
+                // ⚠️ POPUP TONEN ⚠️ 
+
+                alert(`⏰ Schattieeeee je Tijd is om voor je : ${task.name} taak! ❤️‍🔥`); 
+
+                 
+
+                startBtn.disabled = false; 
+
+                pauseBtn.disabled = true; 
+
+                stopBtn.disabled = true; 
+
+            } 
+
+        }, 1000); 
+
+        startBtn.disabled = true; 
+
+        pauseBtn.disabled = false; 
+
+        stopBtn.disabled = false; 
+
+    } 
+
+} 
+
+  
+
+  
+
+  
+
+// ✅ Timer pauzeren 
+
+function pauseTimer(task, startBtn, pauseBtn) { 
+
+    clearInterval(activeTimers[task.name]); 
+
+    activeTimers[task.name] = null; 
+
+    startBtn.disabled = false; 
+
+    pauseBtn.disabled = true; 
+
+} 
+
+  
+
+// ✅ Timer stoppen 
+
+function stopTimer(task, timerDisplay, startBtn, pauseBtn, stopBtn) { 
+
+    clearInterval(activeTimers[task.name]); 
+
+    activeTimers[task.name] = null; 
+
+    task.remaining = task.time; // Reset de timer 
+
+    timerDisplay.textContent = formatTime(task.remaining); 
+
+    startBtn.disabled = false; 
+
+    pauseBtn.disabled = true; 
+
+    stopBtn.disabled = true; 
+
+} 
+
+  
+
+  
+
+// ✅ Taak verwijderen 
+
+function deleteTask(task, listItem) { 
+
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || []; 
+
+    tasks = tasks.filter(t => t.name !== task.name); 
+
+    localStorage.setItem('tasks', JSON.stringify(tasks)); 
+
+    listItem.remove(); 
+
+    totalTasks--; 
+
+    updateProgress(); 
+
+} 
+
+  
+
+// ✅ Helpers 
+
+function formatTime(seconds) { 
+
+    const mins = Math.floor(seconds / 60); 
+
+    const secs = seconds % 60; 
+
+    return `${mins}:${secs.toString().padStart(2, '0')}`; 
+
+} 
+
+  
+
+function updateProgress() { 
+
+    completedTasks = JSON.parse(localStorage.getItem('tasks')).filter(task => task.completed).length; 
+
+    const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0; 
+
+    document.getElementById('progress-bar').style.width = `${progress}%`; 
+
+    document.getElementById('progress-text').textContent = `${Math.round(progress)}% voltooid`; 
+
+} 
+
+  
+
+function updateFolderProgress(folder, tasks) { 
+
+    const completedInFolder = tasks.filter(task => task.completed).length; 
+
+    const totalInFolder = tasks.length; 
+
+    const progress = totalInFolder > 0 ? (completedInFolder / totalInFolder) * 100 : 0; 
+
+  
+
+    document.getElementById(`progress-bar-${folder}`).style.width = `${progress}%`; 
+
+    document.getElementById(`progress-text-${folder}`).textContent = `${Math.round(progress)}% voltooid`; 
+
+} 
+
+  
+
+function updateLocalStorage(task) { 
+
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || []; 
+
+    const taskIndex = tasks.findIndex(t => t.name === task.name); 
+
+    if (taskIndex > -1) { 
+
+        tasks[taskIndex] = task; 
+
+        localStorage.setItem('tasks', JSON.stringify(tasks)); 
+
+    } 
+
+} 
+
+  
+
+document.addEventListener('DOMContentLoaded', function () { 
+
+    document.querySelectorAll('.folder-section summary').forEach(summary => { 
+
+        summary.addEventListener('click', function () { 
+
+            const details = this.parentElement; 
+
+            details.open = !details.open; 
+
+        }); 
+
+    }); 
+
+}); 
+
+document.addEventListener("DOMContentLoaded", function () { 
+
+    // Zoek alle kleurkiezers en voeg een eventlistener toe 
+
+    document.querySelectorAll(".color-picker").forEach(input => { 
+
+        input.addEventListener("input", function () { 
+
+            let mapId = this.getAttribute("data-map-id"); 
+
+            let kleur = this.value; 
+
+  
+
+            // Zoek de bijbehorende map en pas de kleur aan 
+
+            let mapElement = document.getElementById(`map-${mapId}`); 
+
+            if (mapElement) { 
+
+                mapElement.style.backgroundColor = kleur; 
+
+            } 
+
+  
+
+            // Optioneel: Opslaan in LocalStorage 
+
+            localStorage.setItem(`mapColor-${mapId}`, kleur); 
+
+        }); 
+
+    }); 
+
+  
+
+    // Bij het laden: kleuren herstellen uit LocalStorage 
+
+    document.querySelectorAll(".color-picker").forEach(input => { 
+
+        let mapId = input.getAttribute("data-map-id"); 
+
+        let opgeslagenKleur = localStorage.getItem(`mapColor-${mapId}`); 
+
+        if (opgeslagenKleur) { 
+
+            input.value = opgeslagenKleur; 
+
+            let mapElement = document.getElementById(`map-${mapId}`); 
+
+            if (mapElement) { 
+
+                mapElement.style.backgroundColor = opgeslagenKleur; 
+
+            } 
+
+        } 
+
+    }); 
+
+}); 

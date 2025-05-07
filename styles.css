@@ -1,351 +1,190 @@
 /* Algemene stijlen */
 body {
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #4CAF50, #1e1e2e);
-  color: #fff;
-  margin: 0;
-  padding: 20px; /* Voeg wat ruimte toe zodat scrollen natuurlijker aanvoelt */
-  min-height: 100vh; /* In plaats van height: 100vh, zodat de inhoud kan groeien */
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Zorgt ervoor dat de inhoud van boven begint */
-  overflow-y: auto; /* Voorkomt dat scrollen wordt geblokkeerd */
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #4CAF50, #1e1e2e); /* Mooi verloop */
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: background 0.5s ease-in-out; /* Gladde overgang */
 }
-
 
 /* Hoofdcontainer stijlen */
 .container {
-  width: 95%;
-  max-width: 700px;
-  background-color: #2b2d42;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.1); /* Verlichte schaduw voor modern effect */
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.container:hover {
-  box-shadow: 0px 16px 30px rgba(0, 0, 0, 0.15); /* Versterkte schaduw bij hover */
+    width: 95%;
+    max-width: 700px;
+    background-color: #2b2d42;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Titels */
 h1, h2 {
-  text-align: center;
-  font-weight: 600;
-  color: #fafafa;
-  margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+    color: #fafafa;
 }
 
 /* Formulier stijlen */
 form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
 }
 
 /* Invoervelden */
 input[type="text"], input[type="number"] {
-  padding: 14px;
-  border-radius: 8px;
-  border: none;
-  background-color: #3e4e61;
-  color: #fff;
-  font-size: 18px;
-  box-sizing: border-box;
-  transition: background 0.3s ease;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: #3e4e61;
+    color: #fff;
+    font-size: 18px;
+    box-sizing: border-box;
 }
 
-input[type="text"]:focus, input[type="number"]:focus {
-  background-color: #4a5a6d; /* Verandert de achtergrondkleur bij focus */
-  outline: none;
-}
-
-/* Knoppen */
 button {
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
-  font-size: 18px;
-  letter-spacing: 1px;
-  transition: background 0.3s, transform 0.3s, box-shadow 0.3s ease;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    letter-spacing: 1px;
+    transition: background 0.3s, transform 0.3s;
 }
 
 button:hover {
-  background-color: #45a049;
-  transform: scale(1.05);
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2); /* Subtiele schaduw bij hover */
-}
-
-button:active {
-  transform: scale(0.98); /* Schaal de knop een beetje in bij klikken */
+    background-color: #45a049;
+    transform: scale(1.05);
 }
 
 /* Lijst van taken */
 ul {
-  list-style-type: none;
-  padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
 
 li {
-  background-color: #3e4e61;
-  padding: 16px;
-  border-radius: 10px;
-  margin: 15px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+    background-color: #3e4e61;
+    padding: 16px;
+    border-radius: 10px;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-li:hover {
-  background-color: #4a5a6d;
-  transform: translateX(5px); /* Subtiele beweging bij hover */
-}
-
-li .completed {
-  text-decoration: line-through;
-  color: #b5b5b5;
+/* Stijlen voor voltooide taken */
+.completed {
+    text-decoration: line-through;
+    color: #b5b5b5;
 }
 
 /* Vooruitgang balk */
 #progress-container {
-  width: 100%;
-  height: 16px;
-  background: #3e4e61;
-  border-radius: 8px;
-  margin: 20px 0;
+    width: 100%;
+    height: 16px;
+    background: #3e4e61;
+    border-radius: 8px;
+    margin: 20px 0;
 }
-
-#progress-bar {
-  height: 100%;
-  width: 0%;
-  background: #4CAF50;
-  border-radius: 8px;
-  transition: width 0.3s ease-in-out;
-}
-
-/* Popup stijl */
 .popup {
-  display: none;
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background: #2f533a;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  z-index: 1000;
-  transition: transform 0.3s ease;
-}
-
-.popup.show {
-  display: block;
-  transform: translate(-50%, -45%);
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #2f533a;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
 }
 
 .popup button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  border: none;
-  background: #007bff;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border: none;
+    background: #007bff;
+    color: black;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-.popup button:hover {
-  background: #0056b3;
-  transform: scale(1.05); /* Subtiele vergroting bij hover */
-}
 
-/* Folder sectie */
+#progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #4CAF50;
+
+
+}
 .folder-section {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #2b2d42;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px 0;
+    padding: 10px;
 }
 
 .folder-section summary {
-  font-size: 1.2em;
-  font-weight: bold;
-  cursor: pointer;
-  padding: 5px;
-  list-style: none;
-  transition: background 0.3s ease-in-out;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px;
+    list-style: none;
+    transition: background 0.3s ease-in-out;
 }
 
 .folder-section summary:hover {
-  background: #f0f0f0;
-  color: #333;
+    background: #f0f0f0;
 }
 
-/* Taaklijst in folders */
 .task-list {
-  padding-left: 20px;
+    padding-left: 20px;
 }
-.folder-progress {
-    margin-top: 10px;
-    width: 100%;
-    height: 10px;
-    background-color: #e0e0e0;
+.map-container {
+    width: 200px;
+    margin: 20px;
 }
 
-.folder-progress-bar {
-    height: 100%;
-    background-color: #4caf50;
-    width: 0%;
-}
-
-.folder-progress-text {
-    text-align: center;
-    margin-top: 5px;
-    font-size: 12px;
-}
-.folder-progress-text {
-    font-size: 12px;
-    color: #555;
-    margin-left: 5px;
-}
-.progress-wrapper {
-    margin-top: 10px;
-    width: 100%;
-    height: 20px;
-    background-color: #f3f3f3;
-    border-radius: 10px;
-}
-
-.progress-bar {
-    height: 100%;
-    background-color: #4caf50;
-    border-radius: 10px;
-}
-
-.progress-text {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 14px;
-    font-weight: bold;
+.map-toggle {
+    background-color: #4CAF50; /* De kleur van de knop */
     color: white;
-}
-.popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #000;
-    z-index: 1000;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.popup-content {
-    text-align: center;
-    color: black; /* Zorg ervoor dat de tekst zwart is */
-}
-
-button {
-    padding: 10px 20px;
-    margin-top: 10px;
-    background-color: #4CAF50;
-    color: white;
+    padding: 10px;
     border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-.popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: black; /* Achtergrond naar zwart */
-    padding: 20px;
-    border: 1px solid #000;
-    z-index: 1000;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.popup-content {
-    text-align: center;
-    color: white; /* Tekstkleur wit zodat het zichtbaar is op de zwarte achtergrond */
-}
-
-button {
-    padding: 10px 20px;
-    margin-top: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-/* Pop-up container */
-.popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-/* Pop-up inhoud */
-.popup-content {
-    background-color: black; /* Achtergrond naar zwart */
-    color: white; /* Zorgt ervoor dat de tekst zichtbaar is */
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.map-content {
+    display: none; /* Standaard verbergen */
+    background-color: #f1f1f1; /* De kleur van de map (uitvouwbaar gedeelte) */
+    padding: 10px;
+    border-radius: 5px;
 }
 
-/* Tekst in de pop-up */
-.popup-content p {
-    color: white; /* Zorg ervoor dat de tekst wit is voor betere zichtbaarheid */
-    font-size: 16px;
-    margin: 0;
+.map-content ul {
+    list-style-type: none;
     padding: 0;
 }
 
-/* Sluitknop voor de pop-up */
-.popup-close-btn {
-    background-color: #ff0000;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
+.map-content li {
+    padding: 5px 0;
 }
-
-/* Zorg ervoor dat de knop goed wordt weergegeven */
-.popup-close-btn:hover {
-    background-color: #cc0000;
+.map {
+  margin: 10px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  border-radius: 8px;
 }
