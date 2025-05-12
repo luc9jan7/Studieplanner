@@ -19,24 +19,16 @@
     </form>
     
     <!-- Taak toevoegen -->
-<h2>Taak toevoegen</h2>
-<form id="task-form">
-    <label for="task-name"></label>
-    <input type="text" id="task-name" placeholder="Taaknaam" required>
-
-    <label for="task-hours"></label>
-    <input type="number" id="task-hours" placeholder="Uren" min="0" value="" required>
-
-    <label for="task-minutes"></label>
-    <input type="number" id="task-minutes" placeholder="Minuten" min="0" max="59" value="" required>
-
-    <select id="task-folder" required>
-        <option value="">Selecteer een map</option>
-    </select>
-    <button type="submit">Voeg Taak toe</button>
-</form>
-
-
+    <h2>Taak toevoegen</h2>
+    <form id="task-form">
+        <input type="text" id="task-name" placeholder="Taaknaam" required>
+        <input type="number" id="task-hours" placeholder="Uren" min="0" required>
+        <input type="number" id="task-minutes" placeholder="Minuten" min="0" max="59" required>
+        <select id="task-folder" required>
+            <option value="">Selecteer een map</option>
+        </select>
+        <button type="submit">Voeg Taak toe</button>
+    </form>
 
     <!-- Taak lijst -->
     <ul id="task-list"></ul>
@@ -48,21 +40,19 @@
     <p id="progress-text">Voortgang: 0%</p>
 
     <!-- Map lijst -->
-<h2>Huidige Mappen</h2>
-<ul id="folder-list"></ul>
-
+    <h2>Huidige Mappen</h2>
+    <ul id="folder-list"></ul>
 </div>
-<div id="task-list"></div>
 
-
-
-<script src="script.js"></script>
+<!-- Popup -->
 <div id="popup" class="popup">
     <p id="popup-message"></p>
     <button onclick="closePopup()">Okaaaiii</button>
 </div>
 <audio id="alarm-sound" src="alarm.mp3"></audio>
 
+<!-- Verwijzing naar extern script -->
+<script src="script.js"></script>
+
 </body>
 </html>
-

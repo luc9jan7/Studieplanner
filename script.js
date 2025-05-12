@@ -433,16 +433,12 @@ function addEventListeners(listItem, task, folder) {
   
 
     checkbox.addEventListener('change', () => { 
-
-        task.completed = checkbox.checked; 
-
-        updateLocalStorage(task); 
-
-        updateFolderProgress(folder, [task]); 
-
-        loadTasksFromLocalStorage(); 
-
-    }); 
+    task.completed = checkbox.checked; 
+    updateLocalStorage(task); 
+    updateFolderProgress(folder, [task]); 
+    updateProgress(); // Bijwerken van de voortgangsbalk
+});
+ 
 
 } 
 
@@ -584,17 +580,18 @@ function formatTime(seconds) {
 
   
 
-function updateProgress() { 
+function updateProgress() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    totalTasks = tasks.length; // Voeg dit toe!
+    completedTasks = tasks.filter(task => task.completed).length;
 
-    completedTasks = JSON.parse(localStorage.getItem('tasks')).filter(task => task.completed).length; 
+    const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-    const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0; 
+    document.getElementById('progress-bar').style.width = `${progress}%`;
+document.getElementById('progress-text').textContent = `${Math.round(progress)}% voltooid`;
 
-    document.getElementById('progress-bar').style.width = `${progress}%`; 
+}
 
-    document.getElementById('progress-text').textContent = `${Math.round(progress)}% voltooid`; 
-
-} 
 
   
 

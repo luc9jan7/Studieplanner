@@ -8,7 +8,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     transition: background 0.5s ease-in-out; /* Gladde overgang */
 }
 
@@ -91,10 +91,11 @@ li {
 /* Vooruitgang balk */
 #progress-container {
     width: 100%;
-    height: 16px;
-    background: #3e4e61;
-    border-radius: 8px;
-    margin: 20px 0;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
 }
 .popup {
     display: none;
@@ -123,10 +124,8 @@ li {
 
 #progress-bar {
     height: 100%;
-    width: 0%;
-    background: #4CAF50;
-
-
+    width: 0%; /* Standaard staat de voortgangsbalk op 0% */
+    background-color: #4caf50;
 }
 .folder-section {
     border: 1px solid #ccc;
