@@ -588,8 +588,7 @@ function updateProgress() {
     const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
     document.getElementById('progress-bar').style.width = `${progress}%`;
-document.getElementById('progress-text').textContent = `${Math.round(progress)}% voltooid`;
-
+    document.getElementById('progress-text').textContent = `${Math.round(progress)}% voltooid`;
 }
 
 
@@ -708,3 +707,52 @@ document.addEventListener("DOMContentLoaded", function () {
     }); 
 
 }); 
+
+document.getElementById('login-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      // Succesvolle login
+      const user = userCredential.user;
+      console.log("Ingelogd als:", user.email);
+      window.location.href = "home.html"; // Doorverwijzen naar de studieplanner
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error("Fout bij inloggen:", errorMessage);
+      alert("Inloggen mislukt. Controleer je gegevens.");
+    });
+});
+
+document.getElementById('register-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log("Geregistreerd als:", user.email);
+      window.location.href = "home.html"; // Doorverwijzen naar de studieplanner
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error("Fout bij registratie:", errorMessage);
+      alert("Registratie mislukt.");
+    });
+});
+
+// Afmelden
+function logout() {
+  auth.signOut().then(() => {
+    console.log("Uitgelogd!");
+    window.location.href = "login.html"; // Terug naar inlogpagina
+  });
+}
